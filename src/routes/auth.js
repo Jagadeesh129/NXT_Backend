@@ -7,17 +7,23 @@ const multer = require("multer");
 const { deleteFile } = require("../utils/fileHelper");
 const otpGenerator = require("otp-generator");
 const { sendOtpEmail} = require("../utils/emailHelper");
+const fs = require("fs");
 
 const authRouter = express.Router();
 
+const uploadDir = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, "../../uploads");
-        cb(null, uploadPath);
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + "-" + file.originalname);
-    },
+    }
 });
 
 const upload = multer({
