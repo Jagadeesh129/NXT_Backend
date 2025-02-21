@@ -2,7 +2,7 @@ const express = require("express");
 const User = require("../models/userSchema");
 const { validateSignUpData } = require('../utils/validation');
 const bcrypt = require('bcrypt');
-const { userAuth } = require("../middlewares/auth");
+const path = require("path");
 const multer = require("multer");
 const { deleteFile } = require("../utils/fileHelper");
 const otpGenerator = require("otp-generator");
@@ -11,9 +11,15 @@ const { sendOtpEmail} = require("../utils/emailHelper");
 const authRouter = express.Router();
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, "uploads/"),
-    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, "../../uploads");
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "-" + file.originalname);
+    },
 });
+
 const upload = multer({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 },
